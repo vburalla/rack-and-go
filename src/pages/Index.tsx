@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { httpGetJson, httpPostJson } from "@/lib/http";
 
 const TZ = "Europe/Madrid";
 
@@ -108,9 +109,7 @@ const Index = () => {
   async function fetchSlots() {
     setLoadingSlots(true);
     try {
-      const res = await fetch(ENDPOINTS[sport]);
-      if (!res.ok) throw new Error("No se pudieron cargar horarios");
-      const data: string[] = await res.json();
+      const data: string[] = await httpGetJson(ENDPOINTS[sport]);
       const selectedDate = new Date(date + "T00:00:00");
       const filtered = data.filter((iso) => {
         const d = parseISO(iso);
@@ -160,16 +159,12 @@ const Index = () => {
     } as const;
 
     try {
-      const res = await fetch("https://api.appointlet.com/bookings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
+      const res = await httpPostJson<BookingResponse>("https://api.appointlet.com/bookings", body);
       if (res.status !== 201) {
-        const text = await res.text();
+        const text = typeof res.data === "string" ? res.data : JSON.stringify(res.data);
         throw new Error(text || `Error ${res.status}`);
       }
-      const payload: BookingResponse = await res.json();
+      const payload: BookingResponse = res.data as BookingResponse;
       const updated = [payload, ...loadBookings()];
       saveBookings(updated);
       toast({ title: "Reserva confirmada", description: "La verás en Mis reservas" });
