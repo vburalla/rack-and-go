@@ -9,14 +9,23 @@ const NATIVE_ORIGIN = "https://ajuntament-destivella.appointlet.com";
 
 export async function httpGetJson<T = any>(url: string): Promise<T> {
   const headers = {
-    Accept: ACCEPT_HEADER,
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36",
+    "accept": "*/*",
+    "accept-language": "es,es-ES;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6",
+    "priority": "u=1, i",
+    "sec-ch-ua": "\"Not;A=Brand\";v=\"99\", \"Microsoft Edge\";v=\"139\", \"Chromium\";v=\"139\"",
+    "sec-ch-ua-mobile": "?0",
+    "sec-ch-ua-platform": "\"Windows\"",
+    "sec-fetch-dest": "empty",
+    "sec-fetch-mode": "cors",
+    "sec-fetch-site": "cross-site",
+    "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 Edg/139.0.0.0"
   };
 
   if (isWeb) {
     const res = await fetch(url, {
       method: "GET",
       headers,
+      credentials: "include",
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return (await res.json()) as T;
@@ -24,8 +33,9 @@ export async function httpGetJson<T = any>(url: string): Promise<T> {
   const resp = await CapacitorHttp.request({
     url,
     method: "GET",
-    headers: { ...headers, Origin: NATIVE_ORIGIN },
+    headers: headers,
     responseType: "json",
+    withCredentials: true,
   } as HttpOptions);
   if (resp.status < 200 || resp.status >= 300) throw new Error(`HTTP ${resp.status}`);
   return (resp as HttpResponse).data as T;

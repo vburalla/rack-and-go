@@ -159,7 +159,7 @@ const Index = () => {
     } as const;
 
     try {
-      const res = await httpPostJson<BookingResponse>("https://api.appointlet.com/bookings", body);
+      const res = await httpPostJson<BookingResponse>("/api/bookings", body);
       if (res.status !== 201) {
         const text = typeof res.data === "string" ? res.data : JSON.stringify(res.data);
         throw new Error(text || `Error ${res.status}`);
