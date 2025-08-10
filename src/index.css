@@ -38,20 +38,18 @@ All colors MUST be HSL.
 
     --radius: 0.5rem;
 
+    /* Brand enhancements */
+    --primary-glow: 222.2 90% 62%;
+    --shadow-elegant: 0 10px 30px -10px hsl(var(--primary) / 0.35);
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
@@ -101,5 +99,15 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  .bg-gradient-primary {
+    background-image: var(--gradient-primary);
+  }
+  .card-surface {
+    @apply bg-card border rounded-lg shadow-sm;
+    box-shadow: var(--shadow-elegant);
   }
 }
