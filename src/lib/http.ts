@@ -8,10 +8,15 @@ const ACCEPT_HEADER = "application/json, text/plain, */*";
 const NATIVE_ORIGIN = "https://ajuntament-destivella.appointlet.com";
 
 export async function httpGetJson<T = any>(url: string): Promise<T> {
+  const headers = {
+    Accept: ACCEPT_HEADER,
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36",
+  };
+
   if (isWeb) {
     const res = await fetch(url, {
       method: "GET",
-      headers: { Accept: ACCEPT_HEADER },
+      headers,
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return (await res.json()) as T;
@@ -19,7 +24,7 @@ export async function httpGetJson<T = any>(url: string): Promise<T> {
   const resp = await CapacitorHttp.request({
     url,
     method: "GET",
-    headers: { Accept: ACCEPT_HEADER, Origin: NATIVE_ORIGIN },
+    headers: { ...headers, Origin: NATIVE_ORIGIN },
     responseType: "json",
   } as HttpOptions);
   if (resp.status < 200 || resp.status >= 300) throw new Error(`HTTP ${resp.status}`);
@@ -27,20 +32,30 @@ export async function httpGetJson<T = any>(url: string): Promise<T> {
 }
 
 export async function httpPostJson<T = any>(url: string, body: any): Promise<HttpPostResult<T>> {
+  const headers = {
+    "Content-Type": "application/json",
+    Accept: ACCEPT_HEADER,
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36",
+  };
+
   if (isWeb) {
     const res = await fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json", Accept: ACCEPT_HEADER },
+      headers,
       body: JSON.stringify(body),
     });
     let data: any = null;
-    try { data = await res.json(); } catch { /* ignore */ }
+    try {
+      data = await res.json();
+    } catch {
+      /* ignore */
+    }
     return { status: res.status, data } as HttpPostResult<T>;
   }
   const resp = await CapacitorHttp.request({
     url,
     method: "POST",
-    headers: { "Content-Type": "application/json", Accept: ACCEPT_HEADER, Origin: NATIVE_ORIGIN },
+    headers: { ...headers, Origin: NATIVE_ORIGIN },
     data: body,
     responseType: "json",
   } as HttpOptions);
